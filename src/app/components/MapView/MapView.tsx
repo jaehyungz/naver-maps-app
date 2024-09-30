@@ -152,13 +152,13 @@ function MapView() {
       }
     });
 
-    // updateOverlays(overlays);
+    updateOverlays(overlays);
 
     // 처음엔 실행안함
     naver.maps.Event.addListener(map, "idle", () => {
       setZoomState(map.getZoom());
       // console.log(map.getZoom());
-      updateOverlays(overlays, map.getZoom());
+      updateOverlays(overlays);
     });
   };
 
@@ -173,8 +173,7 @@ function MapView() {
     target.classList.remove("z-10");
   };
 
-  const updateOverlays = (overlays: naver.maps.OverlayView[], zoom: number) => {
-    console.log(zoom);
+  const updateOverlays = (overlays: naver.maps.OverlayView[]) => {
     const map = mapRef.current;
     if (!map) return;
     const bounds = map.getBounds();
