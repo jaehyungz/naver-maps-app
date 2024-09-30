@@ -17,6 +17,7 @@ export function useMap() {
       // disableDoubleClickZoom: true,
 
       zoom: 13,
+      minZoom: 10,
     });
   }, []);
 
