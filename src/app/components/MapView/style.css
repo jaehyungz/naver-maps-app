@@ -1,0 +1,44 @@
+.map {
+  width: 100vw;
+  height: 100vh;
+  /* border: 1px solid red; */
+}
+
+.zoom {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  font-size: 20px;
+  border: 1px solid red;
+  z-index: 10;
+}
+.overlay {
+  position: absolute;
+
+  top: 0px;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  background-color: #5963d9;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+  padding: 4px 10px;
+  color: #fff;
+  min-width: 90px;
+
+  user-select: none; /* 텍스트 선택 방지 */
+  -webkit-user-drag: none; /* 이미지 및 요소 드래그 방지 (웹킷 기반 브라우저) */
+}
+
+.z-10 {
+  z-index: 10;
+  cursor: pointer;
+}
+.button {
+  position: fixed;
+  top: 50px;
+  left: 10px;
+  font-size: 20px;
+  border: 1px solid red;
+  z-index: 10;
+}
