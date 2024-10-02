@@ -62,32 +62,59 @@ function MapView() {
 
   const [zoomState, setZoomState] = useState(13);
 
-  const createMarkers = async () => {
-    const map = mapRef.current ?? undefined;
+  // const createMarkers = async () => {
+  //   const map = mapRef.current ?? undefined;
 
-    if (!map) return;
+  //   if (!map) return;
 
-    let markers: naver.maps.Marker[] = [];
+  //   let markers: naver.maps.Marker[] = [];
 
-    const array = zoomState > 10 ? await dummyApi() : await dummyZoomData();
+  //   const array = zoomState > 10 ? await dummyApi() : await dummyZoomData();
 
-    array.forEach((v) => {
-      const position = new naver.maps.LatLng(v.lat, v.lng);
+  //   array.forEach((v) => {
+  //     const position = new naver.maps.LatLng(v.lat, v.lng);
 
-      var marker = new naver.maps.Marker({
-        position,
-        map,
-      });
+  //     var marker = new naver.maps.Marker({
+  //       position,
+  //       map,
+  //     });
 
-      markers.push(marker);
-    });
+  //     markers.push(marker);
+  //   });
 
-    // updateMarkers(markers);
+  //   // updateMarkers(markers);
 
-    naver.maps.Event.addListener(map, "idle", () => {
-      updateMarkers(markers);
-    });
-  };
+  //   naver.maps.Event.addListener(map, "idle", () => {
+  //     updateMarkers(markers);
+  //   });
+  // };
+
+  // const updateMarkers = (markers: naver.maps.Marker[]) => {
+  //   const map = mapRef.current;
+  //   if (!map) return;
+  //   const bounds = map.getBounds();
+
+  //   for (let index = 0; index < markers.length; index++) {
+  //     const marker = markers[index];
+  //     const position = marker.getPosition();
+
+  //     if (bounds.hasPoint(position)) {
+  //       showMarker(map, marker);
+  //     } else {
+  //       hideMarker(marker);
+  //     }
+  //   }
+  // };
+
+  // function showMarker(map: naver.maps.Map, marker: naver.maps.Marker) {
+  //   if (marker.getMap()) return;
+  //   marker.setMap(map);
+  // }
+
+  // function hideMarker(marker: naver.maps.Marker) {
+  //   if (!marker.getMap()) return;
+  //   marker.setMap(null);
+  // }
 
   const createOverlays = async (
     // zoom: number,
@@ -200,32 +227,6 @@ function MapView() {
     overlay.setMap(null);
   }
 
-  const updateMarkers = (markers: naver.maps.Marker[]) => {
-    const map = mapRef.current;
-    if (!map) return;
-    const bounds = map.getBounds();
-
-    for (let index = 0; index < markers.length; index++) {
-      const marker = markers[index];
-      const position = marker.getPosition();
-
-      if (bounds.hasPoint(position)) {
-        showMarker(map, marker);
-      } else {
-        hideMarker(marker);
-      }
-    }
-  };
-
-  function showMarker(map: naver.maps.Map, marker: naver.maps.Marker) {
-    if (marker.getMap()) return;
-    marker.setMap(map);
-  }
-
-  function hideMarker(marker: naver.maps.Marker) {
-    if (!marker.getMap()) return;
-    marker.setMap(null);
-  }
   // const [data, setData] = useState<Props[]>([]);
 
   // useMemo(async () => {
@@ -244,15 +245,6 @@ function MapView() {
   return (
     <div className="map" id="map">
       <div className="zoom">{zoomState}</div>
-      <div
-        className="button"
-        onClick={() => {
-          // overlaysRef.current.forEach((overaly) => overaly.setMap(null));
-          // overlaysRef.current = [];
-        }}
-      >
-        {zoomState}
-      </div>
     </div>
   );
 }
