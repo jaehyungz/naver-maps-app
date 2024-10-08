@@ -70,18 +70,6 @@ function Page(props: Props) {
       url: "https://i.pinimg.com/474x/2f/76/a2/2f76a266fb8245975b6b27ce829e046b.jpg",
     },
   ];
-  const [heightArr, setHeightArr] = useState<number[]>([]);
-
-  //   useEffect(() => {
-  //     imgs.map((v) => {
-  //       const img = new Image();
-
-  //       img.onload = (v) => {
-  //         setHeightArr((prev) => [...prev, img.height]);
-  //       };
-  //       img.src = v.url;
-  //     });
-  //   }, []);
 
   const variants = {
     open: {
@@ -129,10 +117,6 @@ function Page(props: Props) {
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   useEffect(() => {
-    const length = imgs.length;
-
-    const rows = Math.ceil(imgs.length / 3);
-    const firstItemHeights: number[] = [];
     var heightObejct: any = { 0: [], 1: [], 2: [] };
     var firstIdx = -1;
     var secondIdx = -1;
@@ -145,7 +129,10 @@ function Page(props: Props) {
         firstIdx += 1;
         heightObejct["0"].push(itemRefs.current[i]!.clientHeight);
 
-        const numArray = heightObejct["0"].filter((a, idx) => idx !== firstIdx);
+        const numArray: number[] = heightObejct["0"].filter(
+          (_v: number, idx: number) => idx !== firstIdx
+        );
+
         const sum = numArray.reduce((acc, cur) => {
           return acc + cur;
         }, 0);
@@ -158,7 +145,9 @@ function Page(props: Props) {
         itemRefs.current[i]!.style.transform = `translateX(300px)`;
         heightObejct["1"].push(itemRefs.current[i]!.clientHeight);
 
-        const numArray = heightObejct["1"].filter((a, idx) => idx !== firstIdx);
+        const numArray: number[] = heightObejct["1"].filter(
+          (a: number, idx: number) => idx !== firstIdx
+        );
         const sum = numArray.reduce((acc, cur) => {
           return acc + cur;
         }, 0);
@@ -173,7 +162,9 @@ function Page(props: Props) {
         lastIdx += 1;
         heightObejct["2"].push(itemRefs.current[i]!.clientHeight);
 
-        const numArray = heightObejct["2"].filter((a, idx) => idx !== firstIdx);
+        const numArray: number[] = heightObejct["2"].filter(
+          (a: number, idx: number) => idx !== firstIdx
+        );
         const sum = numArray.reduce((acc, cur) => {
           return acc + cur;
         }, 0);
@@ -211,7 +202,7 @@ function Page(props: Props) {
               className="masonry-item"
               key={idx}
               style={{}}
-              ref={(el) => (itemRefs.current[idx] = el)} // 각 요소에 ref 연결
+              // ref={(el) => (itemRefs.current[idx] = el)} // 각 요소에 ref 연결
             >
               <strong>{idx}이미지</strong>
               <img src={item.url} alt="img" />

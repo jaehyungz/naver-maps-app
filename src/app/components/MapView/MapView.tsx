@@ -2,136 +2,33 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./style.css";
 import { useMap } from "@/app/hooks/useMap";
-import { zoomData } from "@/app/utils/data";
+import MapSideBar from "../MapSideBar";
 
 interface Props {
   lat: number;
   lng: number;
   name: string;
-  // isBig: boolean;
+  size: "big" | "small";
 }
-
-const dummyApi = (): Promise<Props[]> => {
-  return new Promise((resolve) => {
-    const locations = [];
-
-    for (let i = 0; i < 1600; i++) {
-      const lat = Math.random() * (38 - 33) + 33;
-      const lng = Math.random() * (129 - 126) + 126;
-
-      locations.push({ lat, lng, name: `매물${i}호`, isBig: false });
-    }
-    // for (let i = 0; i < zoomData.length; i++) {
-    //   const el = zoomData[i];
-
-    //   locations.push({
-    //     lat: el.lat,
-    //     lng: el.lng,
-    //     name: el.content.shortName,
-    //     isBig: true,
-    //   });
-    // }
-
-    resolve(locations);
-  });
-};
-
-const dummyZoomData = (): Promise<Props[]> => {
-  return new Promise((resolve) => {
-    const locations = [];
-
-    for (let i = 0; i < zoomData.length; i++) {
-      const el = zoomData[i];
-
-      locations.push({
-        lat: el.lat,
-        lng: el.lng,
-        name: el.content.shortName,
-        // isBig: true,
-      });
-    }
-
-    resolve(locations);
-  });
-};
 
 function MapView() {
   const mapRef = useMap();
 
   const overlaysRef = useRef<naver.maps.OverlayView[]>([]); // 오버레이 배열을 저장할 ref
 
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+
   const [zoomState, setZoomState] = useState(13);
 
-  // const createMarkers = async () => {
-  //   const map = mapRef.current ?? undefined;
-
-  //   if (!map) return;
-
-  //   let markers: naver.maps.Marker[] = [];
-
-  //   const array = zoomState > 10 ? await dummyApi() : await dummyZoomData();
-
-  //   array.forEach((v) => {
-  //     const position = new naver.maps.LatLng(v.lat, v.lng);
-
-  //     var marker = new naver.maps.Marker({
-  //       position,
-  //       map,
-  //     });
-
-  //     markers.push(marker);
-  //   });
-
-  //   // updateMarkers(markers);
-
-  //   naver.maps.Event.addListener(map, "idle", () => {
-  //     updateMarkers(markers);
-  //   });
-  // };
-
-  // const updateMarkers = (markers: naver.maps.Marker[]) => {
-  //   const map = mapRef.current;
-  //   if (!map) return;
-  //   const bounds = map.getBounds();
-
-  //   for (let index = 0; index < markers.length; index++) {
-  //     const marker = markers[index];
-  //     const position = marker.getPosition();
-
-  //     if (bounds.hasPoint(position)) {
-  //       showMarker(map, marker);
-  //     } else {
-  //       hideMarker(marker);
-  //     }
-  //   }
-  // };
-
-  // function showMarker(map: naver.maps.Map, marker: naver.maps.Marker) {
-  //   if (marker.getMap()) return;
-  //   marker.setMap(map);
-  // }
-
-  // function hideMarker(marker: naver.maps.Marker) {
-  //   if (!marker.getMap()) return;
-  //   marker.setMap(null);
-  // }
+  const [data, setData] = useState<Props[]>([]);
 
   const createOverlays = async (
-    // zoom: number,
     map: naver.maps.Map | undefined,
     data: Props[]
   ) => {
-    // const map = mapRef.current ?? undefined;
-
     if (!map) return;
 
     const bounds = map.getBounds();
-
-    const overlays: naver.maps.OverlayView[] = [];
-
-    // const array = zoom < 12 ? await dummyZoomData() : await dummyApi();
-    // const array = await dummyApi();
-    // const array = await dummyZoomData();
 
     data.forEach((v) => {
       const position = new naver.maps.LatLng(v.lat, v.lng);
@@ -140,7 +37,9 @@ function MapView() {
 
       const overlayElement = document.createElement("div");
 
-      overlayElement.classList.add("overlay");
+      overlayElement.classList.add(
+        v.size === "big" ? "overlay-big" : "overlay"
+      );
 
       overlayElement.textContent = v.name;
 
@@ -169,8 +68,7 @@ function MapView() {
         }
       };
 
-      overlays.push(overlay);
-      overlaysRef.current = overlays;
+      overlaysRef.current.push(overlay);
 
       if (bounds.hasPoint(position)) {
         overlay.setMap(map);
@@ -179,13 +77,17 @@ function MapView() {
       }
     });
 
-    updateOverlays(overlays);
+    naver.maps.Event.addListener(map, "zoom_changed", (zoom) => {
+      setZoomState(zoom);
+    });
+    naver.maps.Event.addListener(map, "zoomend", () => {
+      overlaysRef.current.forEach((v) => v.setMap(null));
+      overlaysRef.current = [];
+    });
 
     // 처음엔 실행안함
     naver.maps.Event.addListener(map, "idle", () => {
-      setZoomState(map.getZoom());
-      // console.log(map.getZoom());
-      updateOverlays(overlays);
+      updateOverlays();
     });
   };
 
@@ -200,10 +102,11 @@ function MapView() {
     target.classList.remove("z-10");
   };
 
-  const updateOverlays = (overlays: naver.maps.OverlayView[]) => {
+  const updateOverlays = () => {
     const map = mapRef.current;
     if (!map) return;
     const bounds = map.getBounds();
+    const overlays = overlaysRef.current;
 
     for (let index = 0; index < overlays.length; index++) {
       const overlay = overlays[index];
@@ -227,24 +130,30 @@ function MapView() {
     overlay.setMap(null);
   }
 
-  // const [data, setData] = useState<Props[]>([]);
+  useEffect(() => {
+    async function fetchData() {
+      const params = {
+        level: zoomState.toString(),
+      };
+      const queryString = new URLSearchParams(params).toString(); // url에 쓰기 적합한 querySting으로 return 해준다.
 
-  // useMemo(async () => {
-  //   const data = zoom > 11 ? await dummyApi() : await dummyZoomData();
+      const data = await fetch(`/api/map?${queryString}`);
+      const res = await data.json();
+      setData(res.data);
+    }
 
-  //   setData(data);
-  // }, [zoom]);
+    fetchData();
+  }, [zoomState]);
 
-  useMemo(async () => {
-    const data = await dummyApi();
-
-    // const data = zoom > 11 ? await dummyApi() : await dummyZoomData();
-    createOverlays(mapRef.current, data);
-  }, [mapRef.current]);
+  useMemo(() => {
+    if (mapRef.current) {
+      createOverlays(mapRef.current, data);
+    }
+  }, [mapRef.current, data]);
 
   return (
     <div className="map" id="map">
-      <div className="zoom">{zoomState}</div>
+      <MapSideBar />
     </div>
   );
 }

@@ -1,0 +1,34 @@
+.side-bar {
+  position: fixed;
+  left: 16px;
+  top: 16px;
+  min-width: 375px;
+  min-height: calc(100vh - 32px);
+  background-color: #fff;
+  box-shadow: 2px 2px 8px 0px #00000066;
+  z-index: 1;
+  padding: 16px;
+  box-sizing: border-box;
+  border-radius: 8px;
+}
+
+.mini-side-bar {
+  position: fixed;
+  left: 16px;
+  top: 16px;
+  min-width: 375px;
+  z-index: 1;
+  background-color: #fff;
+  box-shadow: 2px 2px 8px 0px #00000066;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  border-radius: 8px;
+  box-sizing: border-box;
+
+  > input {
+    margin-top: 16px;
+    height: 54px;
+    padding: 0px 16px;
+  }
+}

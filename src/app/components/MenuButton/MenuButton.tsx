@@ -6,7 +6,7 @@ interface Props {
   toggle: () => void;
 }
 
-const Path = (props) => (
+const Path = (props: any) => (
   <motion.path
     fill="transparent"
     strokeWidth="3"
