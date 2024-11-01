@@ -1,0 +1,23 @@
+.road-view-container {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.button {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 1;
+}
+
+#map {
+  width: 100vw;
+  height: 100vh;
+}
+
+#pano {
+  width: 100vw;
+  height: 30vh;
+  background-color: red;
+}

@@ -27,6 +27,11 @@
 
   user-select: none;
   -webkit-user-drag: none;
+
+  animation-name: bounce;
+  animation-iteration-count: infinite;
+  animation-duration: 1s;
+  animation-play-state: paused;
 }
 
 .overlay-big {
@@ -66,4 +71,43 @@
   top: 50px;
   left: 10px;
   z-index: 10;
+}
+
+@keyframes bounce {
+  0% {
+    transform: translate3d(-50%, 0px, 0px);
+  }
+
+  20% {
+    transform: translate3d(-50%, -10px, 0px);
+  }
+
+  40% {
+    transform: translate3d(-50%, 0px, 0px);
+  }
+}
+
+.animate {
+  /* animation-delay: 1s; */
+  animation-duration: 1.5s;
+  animation-play-state: running;
+}
+
+.info-window {
+  box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.4);
+  padding: 16px;
+  background-color: #000;
+  color: #fff;
+  position: relative;
+}
+.info-window::after {
+  content: "";
+  width: 0px;
+  height: 0px;
+  border-style: solid;
+  border-width: 20px 16px 0px 0px;
+  border-color: #000 transparent transparent transparent;
+  position: absolute;
+  top: 100%;
+  left: 0px;
 }

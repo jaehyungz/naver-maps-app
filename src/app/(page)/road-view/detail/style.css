@@ -1,0 +1,39 @@
+.road-view-container {
+  display: flex;
+  flex-direction: column;
+}
+#pano {
+  width: 100vw;
+  height: 70vh;
+}
+
+#map {
+  position: relative;
+
+  width: 100vw;
+  height: 30vh;
+}
+
+.arrow {
+  width: 20px;
+  height: 20px;
+  background-color: red;
+  position: absolute;
+  border-radius: 20px;
+  border: 3px solid #fff;
+  z-index: 10;
+}
+
+.arrow::before {
+  content: "";
+  display: inline-block;
+  width: 0;
+  height: 0;
+  border-style: solid;
+  border-width: 0px 12px 12px 12px;
+  border-color: transparent transparent red transparent;
+  position: absolute;
+  top: -15px;
+  left: 50%;
+  transform: translateX(-50%);
+}

@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
+import Header from "../components/Header";
+import { ClientProvider } from "@/api";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -18,9 +20,12 @@ export default function RootLayout({
         <Script
           strategy="beforeInteractive"
           type="text/javascript"
-          src={`https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${process.env.NEXT_PUBLIC_NCP_CLIENT_ID}&submodules=geocoder`}
+          src={`https://oapi.map.naver.com/openapi/v3/maps.js?ncpClientId=${process.env.NEXT_PUBLIC_NCP_CLIENT_ID}&submodules=panorama,geocoder`}
         />
-        {children}
+        <ClientProvider>
+          {/* <Header /> */}
+          {children}
+        </ClientProvider>
       </body>
     </html>
   );

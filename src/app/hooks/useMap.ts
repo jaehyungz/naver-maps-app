@@ -1,22 +1,59 @@
 import { useEffect, useRef, useState } from "react";
 import useMyLocation from "./useMyLocation";
 
+function convertCenter(str: any): { lat: number; lng: number } {
+  try {
+    const parsedData = JSON.parse(str);
+
+    const isValidLat =
+      typeof parsedData.lat === "number" &&
+      parsedData.lat >= -90 &&
+      parsedData.lat <= 90;
+    const isValidLon =
+      typeof parsedData.lng === "number" &&
+      parsedData.lng >= -180 &&
+      parsedData.lng <= 180;
+
+    if (isValidLat && isValidLon) {
+      return {
+        lat: parsedData.lat,
+        lng: parsedData.lng,
+      };
+    }
+  } catch (error) {
+    console.error(error);
+  }
+  return {
+    lat: 37.5075,
+    lng: 127.0646,
+  };
+}
+
 export function useMap() {
-  const postion = useMyLocation();
   const mapRef = useRef<naver.maps.Map>();
 
   useEffect(() => {
+    const zoomState = (() => {
+      const zoomCookieValue = localStorage.getItem("zoom");
+
+      const zoomValue = zoomCookieValue ? Number(zoomCookieValue) : null;
+
+      if (typeof zoomValue === "number" && !isNaN(zoomValue)) {
+        if (zoomValue >= 10 && zoomValue <= 21) {
+          return zoomValue;
+        }
+      }
+
+      return 13; // 기본값
+    })();
+
+    const center = localStorage.getItem("center");
+
+    const position = convertCenter(center);
+
     mapRef.current = new naver.maps.Map("map", {
-      center: new naver.maps.LatLng(
-        // postion.lat ?? 37.5853418,
-        // postion.lng ?? 127.2096612
-        37.4899316,
-        127.0298818
-      ),
-
-      // disableDoubleClickZoom: true,
-
-      zoom: 13,
+      center: new naver.maps.LatLng(position.lat, position.lng),
+      zoom: zoomState,
       minZoom: 10,
     });
   }, []);

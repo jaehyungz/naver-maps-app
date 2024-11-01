@@ -3,7 +3,7 @@
   left: 16px;
   top: 16px;
   min-width: 375px;
-  min-height: calc(100vh - 32px);
+  height: calc(100vh - 32px);
   background-color: #fff;
   box-shadow: 2px 2px 8px 0px #00000066;
   z-index: 1;
@@ -12,7 +12,7 @@
   border-radius: 8px;
 }
 
-.mini-side-bar {
+/* .mini-side-bar {
   position: fixed;
   left: 16px;
   top: 16px;
@@ -31,4 +31,4 @@
     height: 54px;
     padding: 0px 16px;
   }
-}
+} */

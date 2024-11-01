@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 
 function useMyLocation() {
   const [location, setLocation] = useState({
-    lat: 37.5296,
-    lng: 126.9638,
+    lat: 37.500417673083625,
+    lng: 127.07855114783959,
   });
 
   const successCallback = (location: {

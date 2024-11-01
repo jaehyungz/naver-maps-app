@@ -1,4 +1,4 @@
-import { zoomData } from "@/app/utils/data";
+import { normalData, zoomData } from "@/app/utils/data";
 
 import { NextRequest } from "next/server";
 
@@ -6,6 +6,7 @@ export async function GET(request: NextRequest) {
   const url = new URL(request.url);
   const level = url.searchParams.get("level");
   var locations: {
+    id: number;
     lat: number;
     lng: number;
     name: string;
@@ -18,6 +19,7 @@ export async function GET(request: NextRequest) {
         const el = zoomData[i];
 
         locations.push({
+          id: i,
           lat: el.lat,
           lng: el.lng,
           name: el.content.shortName,
@@ -29,16 +31,24 @@ export async function GET(request: NextRequest) {
     });
   } else {
     new Promise((resolve) => {
-      for (let i = 0; i < 1600; i++) {
-        const lat = Math.random() * (38 - 33) + 33;
-        const lng = Math.random() * (129 - 126) + 126;
+      for (let i = 0; i < normalData.data.length; i++) {
+        const el = normalData.data[i];
 
-        locations.push({ lat, lng, name: `매물${i}호`, size: "small" });
+        // const lat = Math.random() * (38 - 33) + 33;
+        // const lng = Math.random() * (129 - 126) + 126;
+        locations.push({
+          id: i,
+          lat: el.lat,
+          lng: el.lng,
+          name: el.name,
+          size: "small",
+        });
+
+        // locations.push({ lat, lng, name: `매물${i}호`, size: "small" });
       }
 
       resolve(locations);
     });
   }
-  console.log("data.length", locations.length);
   return Response.json({ ok: true, data: locations });
 }

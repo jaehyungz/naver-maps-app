@@ -32,15 +32,15 @@ function MapSideBar({ currentData }: Props) {
       />
     </svg>
   );
-  if (!currentData) {
-    return (
-      <div className="mini-side-bar">
-        {renderLogo}
+  // if (!currentData) {
+  //   return (
+  //     <div className="mini-side-bar">
+  //       {renderLogo}
 
-        <input type="text" placeholder="Search" />
-      </div>
-    );
-  }
+  //       <input type="text" placeholder="Search" />
+  //     </div>
+  //   );
+  // }
 
   return <div className="side-bar">{renderLogo}</div>;
 }
