@@ -10,6 +10,8 @@ export const useGetMap = ({ level }: GetMapVariables) => {
       getMap({
         level,
       }),
+    // retryOnMount: true,
+    // gcTime: 0,
   });
   return { data };
 };
@@ -19,12 +21,31 @@ const getMap = async (res: GetMapVariables) => {
     level: res.level.toString(),
   });
 
-  const response = await fetcher(`/map?` + queryString);
+  const response = await fetcher(`/api/map?` + queryString);
 
-  console.log(response);
+  const data: { ok: boolean; data: GetMapResponse[] } = await response.json();
 
-  const data: GetMapResponse[] = await response.json();
-  console.log(data);
+  return data.data;
+};
 
-  return data;
+export const useGetMapDetail = ({ id }: { id: string }) => {
+  const { data } = useQuery({
+    queryKey: queryKeys.map.detail(id)["queryKey"],
+    queryFn: () =>
+      getMapDetail({
+        id,
+      }),
+    enabled: id !== "",
+    // retryOnMount: true,
+    // gcTime: 0,
+  });
+  return { data };
+};
+
+const getMapDetail = async (res: { id: string }) => {
+  const response = await fetcher(`/api/map/${res.id}`);
+
+  const data: { ok: boolean; data: any } = await response.json();
+
+  return data.data;
 };

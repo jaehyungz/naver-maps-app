@@ -1,0 +1,81 @@
+.tool-bar {
+  position: absolute;
+  z-index: 1;
+  right: 16px;
+  top: 16px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.tool-bar ul {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.tool-bar ul li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 38px;
+  height: 38px;
+  background-color: #fff;
+  border-radius: 8px;
+}
+
+.tool-bar .zoom-list li {
+  font-size: 20px;
+  cursor: pointer;
+  position: relative;
+}
+
+.tool-bar .control {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-top: 40px;
+  gap: 8px;
+}
+.tool-bar .control > button {
+  width: 38px;
+  height: 38px;
+  background-color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.tool-bar .control .current {
+  width: 38px;
+  height: 38px;
+  background-color: #fff;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  cursor: pointer;
+}
+.tool-bar .control .control-list {
+  display: flex;
+  background-color: #fff;
+  border-radius: 8px;
+}
+.tool-bar .control .control-list button {
+  border: 1px solid;
+  border: none;
+  /* background-color: #fff; */
+  /* padding: 7px 14px; */
+  height: 38px;
+  padding: 0px 14px;
+  background-color: transparent;
+  cursor: pointer;
+}
+
+.active {
+  background-color: #5963d9 !important;
+  color: #fff;
+}

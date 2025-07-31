@@ -1,10 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import useMyLocation from "./useMyLocation";
 
 function convertCenter(str: any): { lat: number; lng: number } {
-  try {
-    const parsedData = JSON.parse(str);
+  const parsedData = JSON.parse(str);
 
+  if (parsedData) {
     const isValidLat =
       typeof parsedData.lat === "number" &&
       parsedData.lat >= -90 &&
@@ -20,17 +19,19 @@ function convertCenter(str: any): { lat: number; lng: number } {
         lng: parsedData.lng,
       };
     }
-  } catch (error) {
-    console.error(error);
+    return {
+      lat: 37.508863665,
+      lng: 127.063155294,
+    };
   }
+
   return {
-    lat: 37.5075,
-    lng: 127.0646,
+    lat: 37.508863665,
+    lng: 127.063155294,
   };
 }
-
-export function useMap() {
-  const mapRef = useRef<naver.maps.Map>();
+export function useMapState() {
+  const [map, setMap] = useState<naver.maps.Map>();
 
   useEffect(() => {
     const zoomState = (() => {
@@ -51,17 +52,16 @@ export function useMap() {
 
     const position = convertCenter(center);
 
-    mapRef.current = new naver.maps.Map("map", {
+    const obj = new naver.maps.Map("map2", {
       center: new naver.maps.LatLng(position.lat, position.lng),
       zoom: zoomState,
       minZoom: 10,
     });
-    return () => {
-      mapRef.current = undefined;
-    };
+
+    setMap(obj);
   }, []);
 
-  return mapRef;
+  return { map };
 }
 
 // const key = "464f59414a6a61653539715475786d";

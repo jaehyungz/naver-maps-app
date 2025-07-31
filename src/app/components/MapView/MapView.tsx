@@ -1,5 +1,12 @@
 "use client";
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  MutableRefObject,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import "./style.css";
 import { useMap } from "@/app/hooks/useMap";
 import MapSideBar from "../MapSideBar";
@@ -7,9 +14,11 @@ import { cursorTo } from "readline";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { cookies } from "next/headers";
 import { useCenterState, useZoomState } from "@/app/hooks/use-localstorage";
-import { useGetMap } from "@/api/hooks";
+import { useGetMap, useGetMapDetail } from "@/api/hooks";
+import MapToolBar from "../MapToolBar";
+import { WithMap } from "../withMap";
 
-interface Props {
+interface GetMapResponse {
   id: number;
   lat: number;
   lng: number;
@@ -17,12 +26,15 @@ interface Props {
   size: "big" | "small";
 }
 
-function MapView() {
+function MapView(props: { map: MutableRefObject<naver.maps.Map | undefined> }) {
+  const mapRef = props.map;
+
+  // const mapRef = props.map;
   const router = useRouter();
   const pathName = usePathname();
   const searchParams = useSearchParams(); // 변수 선언
 
-  const mapRef = useMap();
+  // const mapRef = useMap();
 
   const overlaysRef = useRef<naver.maps.OverlayView[]>([]); // 오버레이 배열을 저장할 ref
 
@@ -38,15 +50,17 @@ function MapView() {
 
   const { state: centerState, setState: setCenterState } = useCenterState();
 
-  const [data, setData] = useState<Props[]>([]);
+  const [overlayVisible, setOverlayVisible] = useState(true);
+
+  const [id, setId] = useState("");
+  // const [data, setData] = useState<Props[]>([]);
 
   const [activeIdx, setActiveIdx] = useState(-1);
 
-  const { data: asd } = useGetMap({ level: zoomState });
+  const { data } = useGetMap({ level: zoomState });
 
-  useEffect(() => {
-    console.log({ asd });
-  }, [asd]);
+  const { data: detailData } = useGetMapDetail({ id });
+
   const createInfoWindow = (position: naver.maps.LatLng) => {
     const map = mapRef.current;
     if (!map) return;
@@ -74,51 +88,13 @@ function MapView() {
     infowindow.open(map, position);
   };
 
-  // function debounce<T extends (...args: any[]) => void>(
-  //   func: T,
-  //   delay: number
-  // ): (...args: Parameters<T>) => void {
-  //   let timeoutId: NodeJS.Timeout;
-
-  //   return function (...args: Parameters<T>) {
-  //     if (timeoutId) {
-  //       clearTimeout(timeoutId);
-  //     }
-
-  //     timeoutId = setTimeout(() => {
-  //       func(...args);
-  //     }, delay);
-  //   };
-  // }
-
-  // const debounceFn = debounce((e: MouseEvent) => {
-  //   onMouseOut(e);
-  // }, 300);
-
   const createOverlays = async (
     map: naver.maps.Map | undefined,
-    data: Props[]
+    data: GetMapResponse[]
   ) => {
     if (!map) return;
 
     const bounds = map.getBounds();
-
-    // anyRef.current.forEach((el, idx) => {
-    //   if (idx === anyRef.current.length - 1) {
-    //     el.classList.add("animate");
-    //   } else {
-    //     el.classList.remove("animate");
-    //   }
-    // });
-    // anyRef.current.forEach((el, idx) => {
-    //   if (idx === anyRef.current.length - 1) {
-    //     el.classList.add("animate");
-    //     console.log("들어와");
-    //   } else {
-    //     el.classList.remove("animate");
-    //     console.log("안들어와");
-    //   }
-    // });
 
     data.forEach((v, idx) => {
       const position = new naver.maps.LatLng(v.lat, v.lng);
@@ -191,6 +167,16 @@ function MapView() {
       overlaysRef.current = [];
     });
 
+    naver.maps.Event.addListener(map, "click", (e) => {
+      if (map.layers.get("street")) {
+        const position = e.coord;
+        const lat = position.lat();
+        const lng = position.lng();
+
+        router.push(`/road-view/detail?lat=${lat}&lng=${lng}`);
+      }
+    });
+
     // 처음엔 실행안함
     naver.maps.Event.addListener(map, "idle", (e) => {
       const center = map.getCenter();
@@ -233,14 +219,15 @@ function MapView() {
       router.push(`${pathName}/${id}`);
       return;
     }
+    setId(id.toString());
     router.push(`${pathName}?id=${id}`);
 
-    const target = data.find((item) => item.id === id);
+    const target = data?.find((item) => item.id === id);
 
     if (target) {
       const position = new naver.maps.LatLng(target.lat, target.lng);
 
-      map.panTo(position);
+      // map.panTo(position);
     }
   };
 
@@ -268,6 +255,7 @@ function MapView() {
   //       }
   //     });
   //   };
+
   const onMouseOver =
     (position: naver.maps.LatLng, isBig: boolean) => (e: MouseEvent) => {
       const target = e.target as HTMLDivElement;
@@ -308,34 +296,38 @@ function MapView() {
     }
   };
 
-  function showOverlay(map: naver.maps.Map, overaly: naver.maps.OverlayView) {
+  const showOverlay = (
+    map: naver.maps.Map,
+    overaly: naver.maps.OverlayView
+  ) => {
     if (overaly.getMap()) return;
     overaly.setMap(map);
-  }
+  };
 
-  function hideOverlay(overlay: naver.maps.OverlayView) {
+  const hideOverlay = (overlay: naver.maps.OverlayView) => {
     if (!overlay.getMap()) return;
     overlay.setMap(null);
-  }
+  };
 
-  useEffect(() => {
-    const map = mapRef.current;
-    const id = searchParams.get("id");
+  // useEffect(() => {
+  //   const map = mapRef.current;
+  //   const id = searchParams.get("id");
 
-    console.log(data);
-    console.log(id);
-    if (!map) return;
-    if (!data.length) return;
-    if (!id?.length) return;
+  //   console.log("여기들어옴? 다시?");
 
-    const target = data.find((item) => item.id === Number(id));
+  //   if (!map) return;
+  //   if (!data?.length) return;
+  //   if (!id?.length) return;
 
-    if (target) {
-      const position = new naver.maps.LatLng(target.lat, target.lng);
+  //   const target = data.find((item) => item.id === Number(id));
 
-      map.panTo(position);
-    }
-  }, [searchParams, mapRef]);
+  //   console.log(target);
+  //   if (target) {
+  //     const position = new naver.maps.LatLng(target.lat, target.lng);
+
+  //     map.panTo(position);
+  //   }
+  // }, [searchParams, mapRef]);
 
   // useEffect(() => {
   //   async function fetchData() {
@@ -350,21 +342,70 @@ function MapView() {
   //   fetchData();
   // }, [zoomState]);
 
-  useMemo(() => {
-    if (mapRef.current) {
-      createOverlays(mapRef.current, data);
+  const handleOverlayVisible = () => {
+    setOverlayVisible((prev) => !prev);
+
+    if (overlayVisible) {
+      overlaysRef.current.forEach((v) => v.onRemove());
+      overlaysRef.current = [];
+    } else {
+      createOverlays(mapRef.current, data?.length ? data : []);
     }
-  }, [mapRef.current, data]);
+  };
+
+  // 최초에 지도 위치 검색 후 오버레이 그리기용 side Effect
+  useEffect(() => {
+    createOverlays(mapRef.current!, data ? data : []);
+  }, [data]);
+
+  // searchParams 가 변경될때마다 id값을 useState initialization
+  useEffect(() => {
+    const id = searchParams.get("id");
+    setId(id ?? "");
+  }, [searchParams]);
+
+  // searchParams값을 이용해서 요청성공한 /map/{id} 값의 data좌표를 검색후 panTo
+  useEffect(() => {
+    if (detailData) {
+      const target = data?.find((item) => item.id.toString() === detailData.id);
+
+      if (target) {
+        const position = new naver.maps.LatLng(target.lat, target.lng);
+        mapRef.current?.panTo(position);
+      }
+    }
+  }, [detailData]);
 
   return (
     <>
-      {/* <input type="text" onChange={handleChange} /> */}
-
       <div className="map" id="map">
-        <MapSideBar />
+        <MapSideBar currentData={detailData} />
+
+        {/* <div
+          style={{
+            position: "absolute",
+            top: 16,
+            left: 16,
+            color: "red",
+            zIndex: 1,
+          }}
+        >
+          {mapRef.current?.getZoom()}
+        </div> */}
+
+        {mapRef.current ? (
+          <MapToolBar
+            map={mapRef.current}
+            onVisibleOverlay={handleOverlayVisible}
+            overlayVisible={overlayVisible}
+          />
+        ) : (
+          <></>
+        )}
       </div>
     </>
   );
 }
 
+// export default WithMap(MapView);
 export default MapView;

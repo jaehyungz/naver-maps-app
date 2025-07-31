@@ -3,7 +3,7 @@ export async function fetcher(
   init?: RequestInit,
   serverCookie?: string
 ) {
-  const response = await fetch(`http://localhost:3001${url}`, {
+  const response = await fetch(`http://localhost:3000${url}`, {
     ...init,
   });
 

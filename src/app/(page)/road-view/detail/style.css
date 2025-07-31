@@ -7,9 +7,8 @@
   height: 70vh;
 }
 
-#map {
+#road-map {
   position: relative;
-
   width: 100vw;
   height: 30vh;
 }

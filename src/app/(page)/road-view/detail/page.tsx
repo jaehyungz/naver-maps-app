@@ -45,7 +45,7 @@ function Page() {
       Number(position.lng)
     );
 
-    mapRef.current = new naver.maps.Map("map", {
+    mapRef.current = new naver.maps.Map("road-map", {
       center: new naver.maps.LatLng(latlng),
     });
 
@@ -193,7 +193,7 @@ function Page() {
   return (
     <div className="road-view-container">
       <div id="pano" />
-      <div id="map" />
+      <div id="road-map" />
     </div>
   );
 }

@@ -6,7 +6,10 @@ import {
 
 const mapKeys = createQueryKeys("map", {
   list: (level) => ({
-    queryKey: ["getMap"],
+    queryKey: ["getMap", level],
+  }),
+  detail: (id) => ({
+    queryKey: ["getMapDetail", id],
   }),
 
   // info: () => ({

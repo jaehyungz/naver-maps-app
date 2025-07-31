@@ -5,23 +5,55 @@ import Link from "next/link";
 import MapView from "../components/MapView";
 import { useEffect, useState } from "react";
 import Loading from "./loading";
+import { useGetPosts } from "@/api/hooks/posts";
+import { button } from "framer-motion/client";
 
 export default function Home() {
-  const [loading, setLoading] = useState(false);
+  const [id, setId] = useState("1");
+  const { data, isFetching } = useGetPosts(id);
+
+  const handleClick = (item: number) => () => {
+    console.log(isFetching);
+    setId(item.toString());
+    console.log(item.toString());
+  };
+
+  const asd = () => {
+    console.log("!");
+
+    navigator.geolocation.getCurrentPosition(
+      (pos) => console.log(pos),
+      (err) => {
+        console.log(err);
+      }
+    );
+  };
 
   useEffect(() => {
-    const changeLoading = () => {
-      setTimeout(() => {
-        setLoading(false);
-      }, 2000);
-    };
-
-    changeLoading();
+    navigator.geolocation.getCurrentPosition(
+      (pos) => console.log(pos),
+      (err) => console.log(err)
+    );
   }, []);
 
-  if (loading) {
-    return <Loading />;
-  }
+  return (
+    <div>
+      {Array.from({ length: 251 }, (_, i) => i + 1).map((item) => {
+        return (
+          <button key={item} onClick={handleClick(item)}>
+            {item} 조회 버튼
+          </button>
+        );
+      })}
 
-  return <div>home!!</div>;
+      <button onClick={asd}>hello</button>
+      <div>
+        {data?.id}
+        <br />
+        {data?.title}
+        <br />
+        {data?.userId}
+      </div>
+    </div>
+  );
 }
